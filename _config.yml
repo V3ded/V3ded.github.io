@@ -1,6 +1,6 @@
 title: "root@V3dedBlog:~#"
 author: "V3ded"
-description: "Theme made with <b style=\"color: #f45;\">&lt;3</b> by <b><a href=\"https://github.com/niklasbuschmann\">@niklasbuschmann</a></b>"
+description: "A website where I post about security and infosec related concepts!"
 permalink: /:categories/:title
 lang: "en"
 excerpt_separator: "\n\n\n"
