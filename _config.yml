@@ -39,8 +39,9 @@ comments:
 #  disqus_shortname: ""      # see https://disqus.com/
 #  isso_domain: ""           # see https://posativ.org/isso/
 
+url: "https://v3ded.github.io"
 plugins:
  - jekyll-feed          #gem install jekyll-feed
  - jekyll-paginate      #gem install jekyll-paginate
-# - jekyll-sitemap      #gem install jekyll-sitemap
+ - jekyll-sitemap       #gem install jekyll-sitemap
  - jekyll-redirect-from #gem install jekyll-redirect-from
