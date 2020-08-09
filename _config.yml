@@ -1,0 +1,46 @@
+title: "root@V3dedBlog:~#"
+author: "V3ded"
+description: "Theme made with <b style=\"color: #f45;\">&lt;3</b> by <b><a href=\"https://github.com/niklasbuschmann\">@niklasbuschmann</a></b>"
+permalink: /:categories/:title
+lang: "en"
+excerpt_separator: "\n\n\n"
+date_format: "%B %d, %Y"
+
+# Layout
+
+sidebar: false               # show a sidebar instead of the usual header
+show_excerpts: true          # show article excerpts on the home page
+show_related: true           # show the previous and next links after every post
+show_description: true       # show the site description in the sidebar
+show_title: true             # always keep the site title visible
+
+paginate: 4                  # Number of posts to paginate
+
+# Styling
+
+dark_header: true           # always keep the header dark
+minimal: false               # use simpler style
+
+# Menu
+
+navigation:
+  - {file: "categories.md", icon:categories}
+  - {file: "archive.html", icon:archive }
+  - {file: "about.md", icon:address-card}
+
+external:                    # see http://fontawesome.com/icons
+#  - {title: Mail, icon: twitter, url: "mailto:niklasbuschmann@users.noreply.github.com"}
+#  - {title: Github, icon: github, url: "https://github.com/niklasbuschmann/contrast"}
+#  - {title: Subscribe, icon: rss, url: "/feed.xml"}
+disqus_username: v3dedworkshop
+#google-analytics: UA-107997378-1
+
+comments:
+#  disqus_shortname: ""      # see https://disqus.com/
+#  isso_domain: ""           # see https://posativ.org/isso/
+
+plugins:
+ - jekyll-feed          #gem install jekyll-feed
+ - jekyll-paginate      #gem install jekyll-paginate
+# - jekyll-sitemap      #gem install jekyll-sitemap
+ - jekyll-redirect-from #gem install jekyll-redirect-from

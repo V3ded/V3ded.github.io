@@ -1,0 +1,2 @@
+contrast/_sass/index.sass:$font-size: calc(0.8rem + 0.3vw) !default
+                          $dark: #1c1d22 !default

