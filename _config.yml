@@ -24,16 +24,16 @@ minimal: false               # use simpler style
 # Menu
 
 navigation:
-  - {file: "categories.md", icon:categories}
-  - {file: "archive.html", icon:archive }
-  - {file: "about.md", icon:address-card}
+  - {file: "categories.md", icon: address-card}
+  - {file: "archive.html", icon: address-card }
+  - {file: "about.md", icon: address-card}
 
 external:                    # see http://fontawesome.com/icons
 #  - {title: Mail, icon: twitter, url: "mailto:niklasbuschmann@users.noreply.github.com"}
 #  - {title: Github, icon: github, url: "https://github.com/niklasbuschmann/contrast"}
 #  - {title: Subscribe, icon: rss, url: "/feed.xml"}
 disqus_username: v3dedworkshop
-#google-analytics: UA-107997378-1
+google-analytics: UA-107997378-1
 
 comments:
 #  disqus_shortname: ""      # see https://disqus.com/
