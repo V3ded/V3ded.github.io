@@ -284,7 +284,7 @@ Cons:
 
 - No cap on machine reboots, silly and frequent reboot requests by silly people (*edit: this has since been capped and therefore is less of an issue, see the next point*)
 
-- "Ghost" reboots that bypass the reboot request page. A lot of them.
+- "Ghost" reboots that bypass the reboot request page. A lot of them. (*edit: this has been fixed*)
 
 #### -> Misc
 
@@ -316,7 +316,8 @@ Connection issues? Once again, I wasn't affected. But it's hard to miss the occa
 
 And finally... oh man, the holy grail. Machine reboots and lab reverts. As a student in RTO you get access to a panel that allows you to reboot machines (turn on and off) or vote towards a revert of the lab itself (reset to clean state). As per hacking traditions, the moment you get foothold on a machine you worked so hard for, someone tends to reboot it. Poof, there goes your shell and the whole SMB pivot. Better luck next time! 
 
-Jokes aside, the main reason I had an issue with reboots & reverts was because of how unconstrained they were. When it came to reboots, anyone was able to reboot any machine without any restrictions. This meant that you had a **lot** of people mindlessly rebooting boxes when their exploits didn't work. Probably thinking that if they reset the box for the fifth time, their approach would finally work. Reverts were a beast by itself. For a revert to occur, you needed a vote from five *different* RTO members each. There was a bug though, which allowed anyone to request reverts consecutively, basically casting five votes all by himself. This meant that one individual alone was able to completely revert the lab to its default state. I would say that these shenanigans made me loose 15 hours of progress all-together. Luckily RastaMouse recently put restrictions in place so this won't be much of a problem for you! Issues with reverts are completely fixed, however the issue with reboots remains almost the same. Smart users are able to "shadow" reboot any machine, totally bypassing the reboot panel. Although still a problem, the frequency of reboots has somewhat decreased.
+Jokes aside, the main reason I had an issue with reboots & reverts was because of how unconstrained they were. When it came to reboots, anyone was able to reboot any machine without any restrictions. This meant that you had a **lot** of people mindlessly rebooting boxes when their exploits didn't work. Probably thinking that if they reset the box for the fifth time, their approach would finally work. Reverts were a beast by itself. For a revert to occur, you needed a vote from five *different* RTO members each. There was a bug though, which allowed anyone to request reverts consecutively, basically casting five votes all by himself. This meant that one individual alone was able to completely revert the lab to its default state. I would say that these shenanigans made me loose 15 hours of progress all-together. Luckily RastaMouse recently put restrictions in place so this won't be much of a problem for you! ~~The issue with reboots remains almost the same though. Smart users are able to "shadow" reboot any machine, totally bypassing the reboot panel. Although still a problem, the frequency of reboots has somewhat decreased.~~
+
 
 ### - The Exam
 
