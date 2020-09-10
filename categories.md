@@ -49,6 +49,13 @@ redirect_from:
 <h1> Misc </h1>
 <hr style="margin: -0.1em 0 !important;">
 <ul>
-  <li><a href="/misc/2020-blog-update">2020 Blog Update</a></li>
-  <li><a href="/misc/helloworld">Hello World!</a></li>
+  <li>Reviews</li>
+    <ul>
+        <li><a href="/misc/certified-red-team-operator-crto-review">Certified Red Team Operator (CRTO) Course Review</a></li>
+    </ul>
+  <li>Others</li>
+  <ul>
+      <li><a href="/misc/2020-blog-update">2020 Blog Update</a></li>
+      <li><a href="/misc/helloworld">Hello World!</a></li>
+  </ul>
 </ul>

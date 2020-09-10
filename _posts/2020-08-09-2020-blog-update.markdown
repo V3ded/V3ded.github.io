@@ -25,7 +25,7 @@ I spent the last 3 weeks working on this new site, so hopefully you guys like it
 ### - What's new
 - Improved navigation menu
 - Dark / Light mode switch (the button at the top right)
-- All images are now clickable
+- All important images are now clickable
 - All links now redirect to a new window instead of replacing the current one
 - Easier to navigate [Categories page](/categories/){:target="_blank"}
 - Fixed few typos & corrected (hopefully all) mistakes in my blogs 
