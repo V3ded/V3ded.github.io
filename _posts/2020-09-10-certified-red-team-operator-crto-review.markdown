@@ -174,7 +174,9 @@ The exam follows in the footsteps of other practical certifications like the OSC
 
 Compared to other similar certifications (e.g. PentesterAcademy's [CRTP](https://www.pentesteracademy.com/activedirectorylab){:target="_blank"}), which focus on a more manual approach and Powershell *wizardry*, RTO encourages the usage of C2 frameworks and other common tooling found in almost every red teaming arsenal. I personally enjoyed this approach a lot, as the course teaches you not only Active Directory attacks, but also the basic red teaming mindset.
 
-C2 wise, the course branches out into two separate pathways. One can either use [Covenant](https://github.com/cobbr/Covenant){:target="_blank"} (open-source) or [Cobalt Strike](https://www.cobaltstrike.com/){:target="_blank"} (commercial). The idea behind this is that everyone should have an equal opportunity at completing the course be it an enthusiast or a professional.
+C2 wise, the course branches out into two separate pathways. One can either use [Covenant](https://github.com/cobbr/Covenant){:target="_blank"} (open-source) or [Cobalt Strike](https://www.cobaltstrike.com/){:target="_blank"} (commercial). The idea behind this is that everyone should have an equal opportunity at completing the course be it an enthusiast or a professional. 
+
+The course also mentions other frameworks (e.g. [PoshC2](https://github.com/nettitude/PoshC2){:target="_blank"} and [SILENTTRINITY](https://github.com/byt3bl33d3r/SILENTTRINITY){:target="_blank"}), however all the demos are done with the previously mentioned ones. That being said, you should be able to apply the knowledge to different frameworks, albeit with a little extra effort.
 
 ### - Covenant vs Cobalt Strike
 
@@ -261,8 +263,6 @@ Cons:
 - Some of the material can be quite superficial - rather than explaining a concept well you can get a "just do this" approach (e.g. the DPAPI chapter)
 
 - Support is a hit or miss, most of the time it's community driven rather than provider driven (RastaMouse is probably overwhelmed by the amount of requests of he receives - I'd recommend hiring a part-timer to help him)
-
-- Some core red teaming principles such as obfuscation or infrastructure setup are not mentioned at all
 
 - The certification is relatively new and not as well known (in my opinion this is subject to change soon though, the course is on a great path)
 
