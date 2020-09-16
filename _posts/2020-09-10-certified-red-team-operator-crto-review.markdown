@@ -122,6 +122,8 @@ At the time of writing this, the materials are divided into multiple chapters mo
 
 <li>Credentials & User Impersonation</li>
 
+<li>Password Cracking (added 16/09/2020)</li>
+
 <li>Lateral Movement</li>
 
 <li>Session Passing</li>
@@ -144,7 +146,9 @@ At the time of writing this, the materials are divided into multiple chapters mo
 
 <li>Bypassing Defences</li>
 
-<li>Complete Mission, Wrap Up & Post-Engagement</li>
+<li> Complete Mission </li>
+
+<li>Wrap Up & Post-Engagement</li>
 
 </ul>
 
@@ -239,6 +243,8 @@ I listed unreliability as one of the main disadvantages in Covenant. Some of you
 With those things in mind, I still encountered issues though. Those issues weren't as severe, however when learning new topics even small problems are enough to make you question yourself. Did you make a mistake? Or was it just a bug? Did you use the correct command? This was and to my knowledge still is by far the biggest pet peeve Covenant users have with the course. Given the nature of RTO, you are learning a lot of new topics. With Covenant being buggy at times, it will make learning harder as you will have to spend time researching and troubleshooting the framework. Guessing whether you are grasping a concept incorrectly or whether Covenant is just misbehaving can sometimes be tiresome. 
 
 While I didn't mind it that much, it took me approximately two weeks to get used to Covenant and its errors. Afterwards, I didn't have any problems because I knew what what worked properly and what didn't. That being said though, I urge you to not give up on this framework and try out Covenant for yourself. Figure out what works and what doesn't work for you, it will pay off one day. Covenant still has a way to go before I'd consider it ideal for red teaming operations, however it is getting there. Slowly, but surely.
+
+> Note: The material did a good job of mentioning different techniques / approaches for certain tasks. Specifically alternative approaches for P2P communication. If SMB grunts or other similar features don't work for you, RastaMouse also mentions different techniques which hopefully will.
 
 ### - Course Materials & Lab Environment
 
@@ -335,7 +341,7 @@ After I earned my badge I got a lot questions regarding the exam. The paragraph 
 
 # Kudos
 
-Time to slowly wrap this blog up. Let's start with kudos. My thanks goes to all the amazing people I've met throughout the course, mainly Adam, Gh0st and Marek. My grattitude also goes to [Jack](https://twitter.com/jack_halon){:target="_blank"} and [Demitech](https://twitter.com/DemitechX){:target="_blank"} for proofreading this blog before its release. Finally, a huge salute goes to RastaMouse for creating the course and the certification. It was a wonderful journey!
+Time to slowly wrap this blog up. Let's start with kudos. My thanks goes to all the amazing people I've met throughout the course, mainly Adam, [gh0st](https://www.linkedin.com/in/steve-nyan-lin-b69b43114){:target="_blank"} and Marek. My grattitude also goes to [Jack](https://twitter.com/jack_halon){:target="_blank"} and [Demitech](https://twitter.com/DemitechX){:target="_blank"} for proofreading this blog before its release. Finally, a huge salute goes to RastaMouse for creating the course and the certification. It was a wonderful journey!
 
 ***
 
