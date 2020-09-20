@@ -99,7 +99,8 @@ RTO is a practical course. With its purchase you get access to a full-fledged Ac
 </figure>
 
 Now unlike the OSCP and some other training courses, you do **not** receive a PDF. 
-It is also important to mention that access to Canvas or Slack doesn't expire (whereas your lab access does). You will have lifetime access to the course and its subsequent upgrades without any additional payments.
+
+Additionally, it is important to mention that access to Canvas or Slack doesn't expire (whereas your lab access does). You will have lifetime access to the course and its subsequent upgrades without any additional payments.
 
 > Quote from RTO: *RTO is a “rolling course” - which means the materials are never static. As tools, techniques and the threat landscape evolves, so too does RTO. Updates are provided incrementally rather than waiting for “big-bang” v2/v3 releases.*
 
