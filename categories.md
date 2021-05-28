@@ -8,6 +8,12 @@ redirect_from:
 - /tags/
 ---
 
+<h1>Red Team</h1>
+<hr style="margin: -0.1em 0 !important;">
+<ul>
+  <li><a href="/redteam/abusing-lnk-features-for-initial-access-and-persistence">Abusing LNK "Features" for Initial Access and Persistence</a></li>
+</ul>
+
 <h1>Pwn</h1>
 <hr style="margin: -0.1em 0 !important;">
 <ul>
@@ -49,6 +55,11 @@ redirect_from:
 <h1> Misc </h1>
 <hr style="margin: -0.1em 0 !important;">
 <ul>
+  <li>Homelab</li>
+    <ul>
+        <li><a href="/misc/my-homelab-journey">My Homelab journey throughout 2017-2021</a></li>
+</ul>
+
   <li>Reviews</li>
     <ul>
         <li><a href="/misc/certified-red-team-operator-crto-review">Certified Red Team Operator (CRTO) Course Review</a></li>
