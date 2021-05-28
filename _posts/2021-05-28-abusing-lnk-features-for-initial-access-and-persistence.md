@@ -40,6 +40,8 @@ If a shortcut with an activation key is placed on a user's desktop, every invoca
 
 > **Note:** Explorer only allows shortcuts starting with the CTRL+ALT sequence. Other sequences need to be programmatically set via COM (see the following section).
 
+> **EDIT:** According to <a href="https://ss64.com/vb/shortcut.html" target="_blank">documentation</a>, shortcuts should be triggerable even if they are placed in the Startup menu. I unfortunately couldn't make this work.
+
 ***
 
 # Crafting Malicious LNK files via COM
