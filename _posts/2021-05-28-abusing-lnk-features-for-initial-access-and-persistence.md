@@ -264,7 +264,7 @@ Luckily for us, malicious shortcut activation keys come to the rescue here. If s
 # Persistence Capabilities
 Users are bound to use shortcuts once in a while, which can be misused for achieving persistence. I don't really have a proof of concept for this method though, as I simply believe that using the trigger keys for initial access is more practical. That said, getting a working PoC shouldn't be impossible. If you use a key combination such as `CTRL+C`, you'll need to ensure the payload is properly mutexed in order to not trigger a new shell every minute. Additionally, you'd also have to worry about restoring the original shortcut's functionality by making your executable call an API which populates the clipboard. Needless to say, this can get complicated quite fast. When it comes to user level persistence, I would probably just choose a different approach.   
 
-Alternatively, for the lazy attackers out there, there's also an option for trigging a shortcut which isn't used as often, such as `Captial` (CapsLock), `F11` and so forth. If any of these keys don't work then they won't arise as much suspicion as users can easily get around the mild annoyance of not having a working CapsLock. It is a gamble, but is it worth it? Your call.
+Alternatively, for the lazy attackers out there, there's also an option for rigging a shortcut which isn't used as often, such as `Captial` (CapsLock), `F11` and so forth. If any of these keys don't work then they won't arise as much suspicion as users can easily get around the mild annoyance of not having a working CapsLock. It is a gamble, but is it worth it? Your call.
 
 ***
 
