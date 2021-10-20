@@ -85,7 +85,7 @@ Yes, I actually tortured myself so much that I went over the core of the `cnc.c`
 
 <a href="/img/blog/pwn-hacking-botnets/lol.gif" target="_blank"><img class="centerImgSmall" src="/img/blog/pwn-hacking-botnets/lol.gif"></a>
 
-Do you see it? `iffailedu` and `iffailedp` are arguments representing failed username and passwords respectively. This allows logging for failed authentication attempts. The idea itself isn't that bad but the implementation is horrible. Using a `system()` functions instead of C's file I/O functions. Why? The answer is quite simple. 
+Do you see it? `iffailedu` and `iffailedp` are arguments representing failed username and passwords respectively. This allows logging for failed authentication attempts. The idea itself isn't that bad but the implementation is horrible. Using `system()` functions instead of C's file I/O functions. Why? The answer is quite simple. 
 
 Quote from [Subby](https://securityaffairs.co/wordpress/84948/hacking/hacker-hacked-iot-botnets.html){:target="_blank"}:
 > *It’s obvious as to why this is happening. A large percentage of botnet operators are simply following tutorials which have spread around in the community or are accessible on YouTube to set up their botnet.*

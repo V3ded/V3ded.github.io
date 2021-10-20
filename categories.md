@@ -11,6 +11,7 @@ redirect_from:
 <h1>Red Team</h1>
 <hr style="margin: -0.1em 0 !important;">
 <ul>
+  <li><a href="/redteam/utilizing-programmatic-identifiers-progids-for-uac-bypasses">Utilizing Programmatic Identifiers (ProgIDs) for UAC Bypasses</a></li>
   <li><a href="/redteam/abusing-lnk-features-for-initial-access-and-persistence">Abusing LNK "Features" for Initial Access and Persistence</a></li>
 </ul>
 
