@@ -33,7 +33,7 @@ external:                    # see http://fontawesome.com/icons
 #  - {title: Github, icon: github, url: "https://github.com/niklasbuschmann/contrast"}
 #  - {title: Subscribe, icon: rss, url: "/feed.xml"}
 disqus_username: v3dedworkshop
-google-analytics: UA-107997378-1
+google-analytics: G-4JPFLFK753
 
 comments:
 #  disqus_shortname: ""      # see https://disqus.com/

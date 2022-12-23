@@ -10,6 +10,12 @@ finished: true
 excerpt_separator: <!--more-->
 ---
 
+<blockquote style="background:rgba(219, 32, 225, 0.06); border-left:3px solid rgba(255, 0, 0, 0.9)"> 
+<p><b><span style="color:red">Update (23.12.2022):</span></b><br>I want to sincerely apologize for any outdated information that may be present in this post. It has been several years since I took the course and much has changed in the interim. Please use this post as a reference only and be aware that the information contained within is mostly no longer accurate.</p>
+</blockquote>
+
+***
+
 # Preface
 
 The [Red Team Ops (RTO)](https://www.zeropointsecurity.co.uk/red-team-ops){:target="_blank"} course and its corresponding certification, Certified Red Team Operator (CRTO), is relatively new to the security industry. It is developed and maintained by a well known Infosec contributor [RastaMouse](https://twitter.com/_rastamouse){:target="_blank"}. The course teaches you about the basic principles, tools, and techniques that are involved within the red teaming tradecraft, and is aimed towards both red teaming enthusiasts and professionals alike. <!--more--> As of last week (29.08.2020), I have successfully completed this course and finished the exam with enough flags to pass. Being done with the certification, I feel it's only adequate I write about my personal experiences throughout my two month journey.
