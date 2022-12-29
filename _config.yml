@@ -45,3 +45,9 @@ plugins:
  - jekyll-paginate      #gem install jekyll-paginate
  - jekyll-sitemap       #gem install jekyll-sitemap
  - jekyll-redirect-from #gem install jekyll-redirect-from
+
+kramdown:
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    block:
+      line_numbers: true

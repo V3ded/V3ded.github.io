@@ -11,11 +11,18 @@ redirect_from:
 <h1>Red Team</h1>
 <hr style="margin: -0.1em 0 !important;">
 <ul>
-  <li><a href="/redteam/utilizing-programmatic-identifiers-progids-for-uac-bypasses">Utilizing Programmatic Identifiers (ProgIDs) for UAC Bypasses</a></li>
+  <li>Research</li>
+  <ul>
+    <li><a href="/redteam/utilizing-programmatic-identifiers-progids-for-uac-bypasses">Utilizing Programmatic Identifiers (ProgIDs) for UAC Bypasses</a></li>
   <li><a href="/redteam/abusing-lnk-features-for-initial-access-and-persistence">Abusing LNK "Features" for Initial Access and Persistence</a></li>
+   </ul>
+   <li>Development</li>
+  <ul>
+    <li><a href="/redteam/red-team-tactics-writing-windows-kernel-drivers-for-advanced-persistence-part-1">Red Team Tactics: Writing Windows Kernel Drivers for Advanced Persistence (Part 1)</a></li>
+   </ul>
 </ul>
 
-<h1>Pwn</h1>
+<h1>PWN</h1>
 <hr style="margin: -0.1em 0 !important;">
 <ul>
   <li><a href="/pwn/hacking-botnets">Script Kiddie Nightmares: Hacking Poorly Coded Botnets</a></li>
