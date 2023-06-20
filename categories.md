@@ -18,6 +18,7 @@ redirect_from:
    </ul>
    <li>Development</li>
   <ul>
+    <li><a href="/redteam/red-team-tactics-writing-windows-kernel-drivers-for-advanced-persistence-part-2">Red Team Tactics: Writing Windows Kernel Drivers for Advanced Persistence (Part 2)</a></li>
     <li><a href="/redteam/red-team-tactics-writing-windows-kernel-drivers-for-advanced-persistence-part-1">Red Team Tactics: Writing Windows Kernel Drivers for Advanced Persistence (Part 1)</a></li>
    </ul>
 </ul>
